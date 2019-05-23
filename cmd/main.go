@@ -2,14 +2,12 @@ package main
 
 import (
 	"fmt"
-	"strings"
 
-	c "github.com/BNPrashanth/test-go-pg/src/configs"
-	m "github.com/BNPrashanth/test-go-pg/src/models"
+	c "github.com/BNPrashanth/test-go-pg/configs"
+	d "github.com/BNPrashanth/test-go-pg/database"
 	"github.com/spf13/viper"
 
 	"github.com/go-pg/pg"
-	"github.com/go-pg/pg/orm"
 )
 
 func main() {
@@ -27,25 +25,8 @@ func main() {
 	})
 	defer db.Close()
 
-	err := createSchema(db)
+	err := d.CreateSchema(db)
 	if err != nil {
 		panic(err)
 	}
-}
-
-func createSchema(db *pg.DB) error {
-	tables := []interface{}{(*m.User)(nil), (*m.Story)(nil)}
-	for _, model := range tables {
-		err := db.CreateTable(model, &orm.CreateTableOptions{
-			Temp: false,
-		})
-		if err != nil {
-			if strings.Contains(err.Error(), "already exists") {
-				fmt.Println(err.Error())
-			} else {
-				return err
-			}
-		}
-	}
-	return nil
 }
